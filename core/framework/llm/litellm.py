@@ -23,9 +23,9 @@ except ImportError:
     litellm = None  # type: ignore[assignment]
     RateLimitError = Exception  # type: ignore[assignment, misc]
 
+from framework.llm.constants import MODEL_OUTPUT_TOKEN_LIMIT_KEYS, PROVIDER_FALLBACK_MAX_TOKENS
 from framework.llm.provider import LLMProvider, LLMResponse, Tool, ToolResult, ToolUse
 from framework.llm.stream_events import StreamEvent
-from framework.llm.constants import MODEL_OUTPUT_TOKEN_LIMIT_KEYS, PROVIDER_FALLBACK_MAX_TOKENS
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +80,7 @@ RATE_LIMIT_MAX_DELAY = 120  # seconds - cap to prevent absurd waits
 
 # Directory for dumping failed requests
 FAILED_REQUESTS_DIR = Path.home() / ".hive" / "failed_requests"
+
 
 def _estimate_tokens(model: str, messages: list[dict]) -> tuple[int, str]:
     """Estimate token count for messages. Returns (token_count, method)."""
@@ -281,7 +282,6 @@ class LiteLLMProvider(LLMProvider):
                 "LiteLLM is not installed. Please install it with: uv pip install litellm"
             )
 
-
     def _get_provider_from_model(self, model: str) -> str | None:
         """Extract provider name from model string (e.g., 'groq/llama3' -> 'groq')."""
         if "/" in model:
@@ -360,7 +360,11 @@ class LiteLLMProvider(LLMProvider):
             limit = PROVIDER_FALLBACK_MAX_TOKENS[provider]
             applied = min(max_tokens, limit)
             logger.info(
-                "max_tokens resolution model=%s source=fallback.%s requested=%s limit=%s applied=%s",
+                "max_tokens resolution model=%s "
+                "source=fallback.%s "
+                "requested=%s "
+                "limit=%s "
+                "applied=%s",
                 self.model,
                 provider,
                 max_tokens,

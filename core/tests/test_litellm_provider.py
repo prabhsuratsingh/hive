@@ -113,7 +113,9 @@ class TestLiteLLMProviderTokenLimits:
         """When model metadata lookup fails, provider fallback cap should apply."""
         mock_get_model_info.side_effect = RuntimeError("metadata unavailable")
 
-        provider = LiteLLMProvider(model="groq/moonshotai/kimi-k2-instruct-0905", api_key="test-key")
+        provider = LiteLLMProvider(
+            model="groq/moonshotai/kimi-k2-instruct-0905", api_key="test-key"
+        )
 
         assert provider._constrain_max_tokens(99999) == 16384
 
